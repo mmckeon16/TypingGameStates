@@ -28,101 +28,19 @@
 
 	var theWord;
 
+	var rightCount = 0;
+	var wrongCount = 0;
+
+	rightWrongText = "";
 
 var playState = {
 
-
-	win: function() {
-		game.state.start('win');
-	},
-
-	keyPress: function(char){
-	    if(canType){
-	        if(game.input.keyboard.event.keyCode == 8){
-	            inputText.text = inputText.text.substring(0,inputText.text.length - 1);
-	        }else if(game.input.keyboard.event.keyCode == 32){
-	            var userText = inputText.text;
-	            this.checkWord(userText);
-	        }else{
-	            inputText.text += char;
-	            var code = char.charCodeAt(0);
-	        }
-	    }    
-	},
-
-	checkWord: function(userWord){
-
-	    while (!(theWord.substring(begin, end) == space)){
-
-	        begin++;
-	        end++;
-	    }  
-
-	     if (theWord.length != begin + 1){
-	        begin2 = begin + 1;
-	        end2=end + 1;
-	        while (!(theWord.substring(begin2, end2) == space)){
-
-	            begin2++;
-	            end2++;
-	        }  
-	    }
-
-	    if(theWord.substring(index, begin) == userWord){
-	        scoreText.addColor('green', index);
-	        scoreText.addColor('yellow', end);
-	        scoreText.addColor('black', end2);
-
-	        this.moveRight();
-	        console.log("words equal");
-	        index = end;
-	        console.log("index: " + index)
-	        begin = index;
-	        end = index + 1;
-	        this.emptyText();
-	    }
-	    else{
-	        console.log("words not equal");
-	        this.emptyText();
-	    }
-
-	    if (theWord.length == begin){
-	        canType = false;
-	        game.state.start('win');
-	    }
-
-	},
-
-
-	emptyText: function(){
-	    inputText.text = "";
-	},
-
-	getRand: function(min, max) {
-	  return Math.random() * (max - min) + min;
-	},
-
-	moveRight: function() {
-
-	    finalPos = player.x + ((begin-index)*20);
-	    
-	    canMoveRight = true;
-	},
-
-
-	move: function() {
-	    while (player.x < 200){
-	        canMove = true;
-	    }
-	    canMove = false;
-	},
-
-
 	create: function() {
-		    this.game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
-	    this.game.scale.setShowAll();
-	        window.addEventListener('resize', function () {  this.game.scale.refresh();});
-	    this.game.scale.refresh();
+		//maybe this....
+		    //this.game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
+	   // this.game.scale.setShowAll();
+	       // window.addEventListener('resize', function () {  this.game.scale.refresh();});
+	    //this.game.scale.refresh();
 
 	    //  Sets world bounds
 	    game.world.setBounds(0,0,4000,600);
@@ -170,6 +88,7 @@ var playState = {
 	    //  The score
 	    scoreText = game.add.text(32, 16, theWord, { font: "32px Verdana", fill: '#000' });
 	    inputText = game.add.text(380, 200, '', { font: "38px Verdana", fontWeight: 'bold', fill: '#000' });
+	    rightWrongText = game.add.text(400, 300, 'test', { font: "27px Verdana", fontWeight: 'bold', fill: '#000' });
 
 	    //makes initial word yellow
 	    while (!(theWord.substring(color1, color2) == space)){
@@ -191,7 +110,10 @@ var playState = {
 	},
 
 	update: function() {
+		
 		inputText.x = player.x;
+
+		rightWrongText.x = player.x + 100;
 	    game.camera.follow(player);
 
 	    //  Collide the player with the platforms
@@ -258,7 +180,109 @@ var playState = {
 	        }
 	    }
 
-	}
+	},
+
+	win: function() {
+		game.state.start('win');
+	},
+
+	keyPress: function(char){
+	    if(canType){
+	        if(game.input.keyboard.event.charCode == 8){
+	        	console.log(game.input.keyboard.event.keyCode);
+	            this.inputText.text = this.inputText.text.substring(0,this.inputText.text.length - 1);
+	        }else if(game.input.keyboard.event.keyCode == 32){
+	            var userText = inputText.text;
+	            this.checkWord(userText);
+	        }else{
+	            inputText.text += char;
+	            var code = char.charCodeAt(0);
+	        }
+	    }    
+	},
+
+	checkWord: function(userWord){
+
+	    while (!(theWord.substring(begin, end) == space)){
+
+	        begin++;
+	        end++;
+	    }  
+
+	    if (theWord.length != begin + 1){
+	        begin2 = begin + 1;
+	        end2=end + 1;
+	        while (!(theWord.substring(begin2, end2) == space)){
+
+	            begin2++;
+	            end2++;
+	        }  
+	    }
+
+	    if(theWord.substring(index, begin) == userWord){
+	        scoreText.addColor('green', index);
+	        scoreText.addColor('yellow', end);
+	        scoreText.addColor('black', end2);
+
+	        this.moveRight();
+	        console.log("words equal");
+	        index = end;
+	        console.log("index: " + index)
+	        begin = index;
+	        end = index + 1;
+	        this.emptyText();
+	        rightCount++;
+	        console.log(rightCount);
+	    }
+	    else if (theWord.substring(index, begin) != userWord){
+	    	scoreText.addColor('red', index);
+	        scoreText.addColor('yellow', end);
+	        scoreText.addColor('black', end2);
+
+	        console.log("words not equal");
+	        this.moveRight();
+	        console.log("words equal");
+	        index = end;
+	        console.log("index: " + index)
+	        begin = index;
+	        end = index + 1;
+	        this.emptyText();
+	        wrongCount++;
+	    }
+
+	    if (theWord.length == begin){
+	        canType = false;
+	        this.game.state.start('win');
+	    }
+
+	},
+
+
+	emptyText: function(){
+		rightWrongText = "Right: " + rightCount + " " + "Wrong: " + wrongCount;
+	    inputText.text = "";
+	},
+
+	getRand: function(min, max) {
+	  return Math.random() * (max - min) + min;
+	},
+
+	moveRight: function() {
+
+	    finalPos = player.x + ((begin-index)*20);
+	    
+	    canMoveRight = true;
+	},
+
+
+	move: function() {
+	    while (player.x < 200){
+	        canMove = true;
+	    }
+	    canMove = false;
+	},
+
+	
 
 
 	/*

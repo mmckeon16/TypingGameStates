@@ -11,10 +11,12 @@ var winState = {
 
 		var wkey = game.input.keyboard.addKey(Phaser.Keyboard.W);
 
+		//this.wkey.mouse.onMouseDown.add(this.restart);
 		wkey.onDown.addOnce(this.restart, this);
 	},
 
 	restart: function(){
+		//window.location.reload(false);
 		game.state.start('menu');
 	}
 
